@@ -130,9 +130,9 @@ export const AdminPortal = ({ onExit }) => {
             const realBlob = await stripMetadata(c.imgs.real);
             const synthBlob = await stripMetadata(c.imgs.synthetic);
 
-            folder.file('input.png', inputBlob);
-            folder.file('real.png', realBlob);
-            folder.file('synthetic.png', synthBlob);
+            folder.file(c.imgs.input.name.replace(/\.[^/.]+$/, "") + ".png", inputBlob);
+            folder.file(c.imgs.real.name.replace(/\.[^/.]+$/, "") + ".png", realBlob);
+            folder.file(c.imgs.synthetic.name.replace(/\.[^/.]+$/, "") + ".png", synthBlob);
 
             masterKey.push([c.id, 'WARMUP']);
         }
@@ -152,7 +152,7 @@ export const AdminPortal = ({ onExit }) => {
             const targetFile = isReal ? c.imgs.real : c.imgs.synthetic;
             const targetBlob = await stripMetadata(targetFile);
 
-            folder.file('input.png', inputBlob);
+            folder.file(c.imgs.input.name.replace(/\.[^/.]+$/, "") + ".png", inputBlob);
             folder.file('target.png', targetBlob);
         }
 
