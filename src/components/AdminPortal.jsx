@@ -153,7 +153,7 @@ export const AdminPortal = ({ onExit }) => {
             const targetBlob = await stripMetadata(targetFile);
 
             folder.file(c.imgs.input.name.replace(/\.[^/.]+$/, "") + ".png", inputBlob);
-            folder.file('target.png', targetBlob);
+            folder.file(c.imgs.real.name.replace(/real/i, "target").replace(/\.[^/.]+$/, "") + ".png", targetBlob);
         }
 
         // CSV & Zip
