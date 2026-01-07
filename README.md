@@ -46,23 +46,61 @@ npm run dev
 ```
 The app will be available at `http://localhost:5173`.
 
-## Deployment
+## Expected Folder Structure
 
-This is a static Single Page Application (SPA) and is optimized for deployment on platforms like Netlify or Vercel.
+The application requires a specific folder structure for loading local datasets. The dataset folder should contain `warmup` and `test` subdirectories.
 
-### Deploying to Netlify (Recommended)
+```text
+MyDataset/
+  ├── warmup/
+  │   ├── Case1/
+  │   │   ├── input.png
+  │   │   ├── real.png
+  │   │   └── synthetic.png
+  │   └── Case2/ ...
+  └── test/
+      ├── CaseA/ ...
+      └── CaseB/ ...
+```
 
-1.  **Build the Project:**
-    ```bash
-    npm run build
-    ```
-    This generates a `dist` folder.
-2.  **Upload:**
-    -   Go to [Netlify Drop](https://app.netlify.com/drop).
-    -   Drag and drop the `dist` folder.
-    -   Your site is now live!
+*Note: Filenames should contain "input"/"source", "real", and "synthetic"/"gen" to be recognized by the app.*
 
-*Note: A `netlify.toml` file is included to handle client-side routing.*
+## Deployment & Distribution
+
+This tool can be deployed via Netlify or similar services. You have two main options for distributing the tool and data to experts.
+
+### Option A: Hybrid (Recommended for Large MRI Sets)
+Host the app application online, but distribute the heavy image data separately.
+
+1.  **Host the App**:
+    -   Run `npm run build` to create a `dist` folder.
+    -   Upload the `dist` folder to [Netlify Drop](https://app.netlify.com/drop).
+    -   You get a public link (e.g., `https://mri-validator.netlify.app`).
+
+2.  **Distribute Data**:
+    -   Zip your `warmup` and `test` image folders.
+    -   Send the Zip file to your experts (Email, Drive, Dropbox).
+
+3.  **Expert Workflow**:
+    -   Expert opens your App URL.
+    -   Expert extracts the images on their local machine.
+    -   Expert clicks **"Load Image Folder"** in the app and selects their folder.
+   
+    *Pros: Zero storage costs, faster loading for huge files, data privacy.*
+
+### Option B: Fully Bundled (Small Sets Only)
+Embed the images directly into the application.
+
+1.  Place all images inside the `public/` directory of this project.
+2.  Create a `manifest.json` file pointing to them (relative paths).
+3.  Edit `src/App.jsx` to load this new manifest by default instead of the Demo one.
+4.  Deploy the app. Experts access everything via just the link.
+   
+    *Pros: Easiest for experts. Cons: App becomes large/slow if you have GBs of images.*
+
+### Netlify Deployment Notes
+-   **Routing**: A `netlify.toml` file is included to handle client-side routing.
+-   **Security**: Since the app runs entirely in the browser, there are no server-side secrets or databases to configure.
 
 ## User Guide
 
@@ -79,12 +117,22 @@ This is a static Single Page Application (SPA) and is optimized for deployment o
 1.  Open the deployed application.
 2.  Click **"Load Image Folder"** and select the folder provided by the administrator (unzipped).
 3.  Enter your Name/ID to start.
-4.  **Warm-up**: Evaluate cases with immediate feedback.
-5.  **Test**: Evaluate blinded cases.
-6.  **Finish**: Download your results as a CSV file and send it back to the administrator.
+### Session Flow for Experts
+1.  **Warm-up**: 
+    -   Observe the Left Input.
+    -   Judge if the Right Target is Real or Synthetic.
+    -   Click Submit.
+    -   **Feedback**: A pop-up tells you if you were right.
+2.  **Transition**: Automatically moves to Test phase after warm-up cases are done.
+3.  **Test Phase**:
+    -   No feedback is provided.
+    -   Progress bar updates.
+4.  **Completion**:
+    -   "Session Complete" screen.
+    -   Click **Download Results** to get the CSV.
 
 ## File Naming Convention
 To ensure the app correctly detects image types and modalities, use the following conventions in your filenames:
 -   **Type**: `input`, `real`, `synth` (or `fake`)
 -   **Modality**: Append as the last part after an underscore (e.g., `_T1.png`, `_PD.jpg`)
-    -   Example: `case123_input_T1.png` -> Displays as **T1**
+    -   Example: `input_T1.png` -> Displays as **T1**
