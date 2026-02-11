@@ -7,6 +7,25 @@ import { exportResultsToCSV } from './utils/csvExporter';
 import { parseFolder } from './utils/folderParser';
 import { AdminPortal } from './components/AdminPortal';
 
+import logo from './assets/logo.jpeg';
+
+// Common Header Component
+const Header = ({ userId }) => (
+  <header>
+    <div
+      style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}
+      onClick={() => window.location.reload()}
+      title="Return to Home"
+    >
+      <img src={logo} alt="Logo" style={{ height: '40px', width: 'auto' }} />
+      <h1>MRI Authenticity Validator</h1>
+    </div>
+    <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+      {userId && `User: ${userId}`}
+    </div>
+  </header>
+);
+
 function App() {
   const {
     phase,
@@ -54,16 +73,22 @@ function App() {
 
   if (adminMode) {
     return (
-      <div className="layout-container" style={{ alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}>
-        <AdminPortal onExit={() => setAdminMode(false)} />
+      <div className="layout-container">
+        <Header userId={userId} />
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '10vh', flex: 1 }}>
+          <AdminPortal onExit={() => setAdminMode(false)} />
+        </div>
       </div>
     );
   }
 
   if (phase === 'loading') {
     return (
-      <div className="layout-container" style={{ alignItems: 'flex-start', justifyContent: 'center', textAlign: 'center', paddingTop: '10vh' }}>
+      <div className="layout-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', textAlign: 'center' }}>
         <div className="glass-card">
+          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <img src={logo} alt="Logo" style={{ width: '120px', height: 'auto', marginBottom: '1rem' }} />
+          </div>
           <h1>MRI Authenticity Validator</h1>
           <p style={{ color: 'var(--text-muted)' }}>Select a data source to begin evaluation.</p>
 
@@ -113,30 +138,35 @@ function App() {
     );
   }
 
+
+
   if (phase === 'registration') {
     return (
-      <div className="layout-container" style={{ alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}>
-        <div style={styles.resultsContainer}>
-          <h1>Expert Registration</h1>
-          <p>Please enter your ID or Name to begin the session.</p>
+      <div className="layout-container">
+        <Header userId={userId} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <div style={styles.resultsContainer}>
+            <h1>Expert Registration</h1>
+            <p>Please enter your ID or Name to begin the session.</p>
 
-          <input
-            type="text"
-            value={expertName}
-            onChange={(e) => setExpertName(e.target.value)}
-            placeholder="Enter Expert Name/ID"
-            style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)', minWidth: '250px' }}
-          />
+            <input
+              type="text"
+              value={expertName}
+              onChange={(e) => setExpertName(e.target.value)}
+              placeholder="Enter Expert Name/ID"
+              style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)', minWidth: '250px' }}
+            />
 
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              if (expertName.trim()) registerExpert(expertName.trim());
-            }}
-            disabled={!expertName.trim()}
-          >
-            Start Session
-          </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                if (expertName.trim()) registerExpert(expertName.trim());
+              }}
+              disabled={!expertName.trim()}
+            >
+              Start Session
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -144,29 +174,38 @@ function App() {
 
   if (phase === 'finished') {
     return (
-      <div className="layout-container" style={{ alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}>
-        <div style={styles.resultsContainer}>
-          <h1>Session Complete</h1>
-          <p>Thank you for participating.</p>
+      <div className="layout-container">
+        <Header userId={userId} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <div style={styles.resultsContainer}>
+            <h1>Session Complete</h1>
+            <p>Thank you for participating.</p>
 
-          <div style={styles.statBox}>
-            <p><strong>Total Cases:</strong> {results.length}</p>
-            <p><strong>User ID:</strong> {userId}</p>
-          </div>
+            <div style={styles.statBox}>
+              <p><strong>Total Cases:</strong> {results.length}</p>
+              <p><strong>User ID:</strong> {userId}</p>
+            </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button className="btn btn-primary" onClick={handleExport}>
-              Download Results (CSV)
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button className="btn btn-primary" onClick={handleExport}>
+                Download Results (CSV)
+              </button>
 
-            <button className="btn" onClick={() => {
-              if (confirm("Have you downloaded the results? Clicking OK will reset for the next user.")) {
-                setExpertName('');
-                resetSession();
-              }
-            }}>
-              Start New Session
-            </button>
+              <button className="btn" onClick={() => {
+                window.location.reload();
+              }}>
+                Home
+              </button>
+
+              <button className="btn" onClick={() => {
+                if (confirm("Have you downloaded the results? Clicking OK will reset for the next user.")) {
+                  setExpertName('');
+                  resetSession();
+                }
+              }}>
+                Start New Session
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -175,11 +214,14 @@ function App() {
 
   if (phase === 'transition_warmup_to_test') {
     return (
-      <div className="layout-container" style={{ alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}>
-        <div style={{ ...styles.resultsContainer, borderColor: 'var(--accent-color)' }}>
-          <h1>Warm-up Complete</h1>
-          <p>Starting Test Phase...</p>
-          <div style={{ marginTop: '1rem', fontSize: '2rem' }}>⏳</div>
+      <div className="layout-container">
+        <Header userId={userId} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+          <div style={{ ...styles.resultsContainer, borderColor: 'var(--accent-color)' }}>
+            <h1>Warm-up Complete</h1>
+            <p>Starting Test Phase...</p>
+            <div style={{ marginTop: '1rem', fontSize: '2rem' }}>⏳</div>
+          </div>
         </div>
       </div>
     );
@@ -193,12 +235,7 @@ function App() {
 
   return (
     <div className="layout-container">
-      <header>
-        <h1>MRI Authenticity Validator</h1>
-        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          User: {userId}
-        </div>
-      </header>
+      <Header userId={userId} />
 
       <div style={styles.mainContent}>
         <div style={styles.viewerSection}>

@@ -32,7 +32,7 @@ A specialized web application designed for expert validation of MRI image synthe
 1.  Clone the repository:
     ```bash
     git clone <repository-url>
-    cd blinded-mri-validator
+    cd MRI-Authenticity-Validator
     ```
 2.  Install dependencies:
     ```bash
